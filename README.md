@@ -11,13 +11,16 @@ make
 
 ### 2. Build gem5 & m5ops
 
-Run these commands from the root /gem5 directory:
-```bash 
-cd gem5
-```
-gem5: ` scons build/{ISA}/gem5.{variant} -j {cpus} `
 
-m5ops: ` scons build/{TARGET_ISA}/out/m5 ` (run from /gem5/util/m5)
+i) gem5: 
+```bash 
+cd gem5 && scons build/{ISA}/gem5.{variant} -j {cpus}
+```
+
+ii) m5ops: 
+```bash
+cd util/m5 && scons build/{TARGET_ISA}/out/m5 '
+```
 
 ### 3. Run Simulation
 

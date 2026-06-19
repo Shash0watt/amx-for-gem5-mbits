@@ -1219,7 +1219,6 @@ LSQUnit::completeStore(typename StoreQueue::iterator store_idx)
 }
 
 bool
-// THIS IS THE EXAMPLE OF HOW TO SEND THINGS THROUGH THE DATA PORT
 LSQUnit::trySendPacket(bool isLoad, PacketPtr data_pkt)
 {
     bool ret = true;

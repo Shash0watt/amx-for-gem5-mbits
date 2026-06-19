@@ -114,7 +114,6 @@ void m5Syscall(ThreadContext *tc);
 void togglesync(ThreadContext *tc);
 void triggerWorkloadEvent(ThreadContext *tc);
 void m5Hypercall(ThreadContext *tc, uint64_t hypercall_id);
-void amxLoadd(ThreadContext *tc, uint64_t tile_num, uint64_t vaddr, size_t stride);
 
 /**
  * Execute a decoded M5 pseudo instruction
@@ -254,11 +253,6 @@ pseudoInstWork(ThreadContext *tc, uint8_t func, uint64_t &result)
       case M5OP_HYPERCALL:
         invokeSimcall<ABI>(tc, m5Hypercall);
         return true;
-
-      case AMX_TILE_LOADD:
-        invokeSimcall<ABI>(tc, amxLoadd);
-        return true;
-
       default:
         warn("Unhandled m5 op: %#x\n", func);
         return false;

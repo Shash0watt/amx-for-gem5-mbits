@@ -33,7 +33,6 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# rememeber that this exists
 microcode = """
 def macroop ADDSS_XMM_XMM {
     maddf xmml, xmml, xmmlm, size=4, ext=Scalar

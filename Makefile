@@ -1,7 +1,7 @@
 GEM5_PATH = gem5
 ISA = x86
 CC = gcc
-TARGET = avx/load_test
+TARGET = amx-workloads/load_test
 
 all: $(TARGET)
 
