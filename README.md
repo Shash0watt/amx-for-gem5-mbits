@@ -1,4 +1,5 @@
-# Research project implementing Intel AMX features into gem5 to profile matrix multiplication and LLM inference workloads.
+# AMX for gem5
+Research project implementing Intel AMX features into gem5 to profile matrix multiplication and LLM inference workloads.
 
 ## Usage
 
