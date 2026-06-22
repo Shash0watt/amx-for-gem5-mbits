@@ -127,7 +127,10 @@ CPUProgressEvent::description() const
 }
 
 BaseCPU::BaseCPU(const Params &p, bool is_checker)
-    : ClockedObject(p), instCnt(0), _cpuId(p.cpu_id), _socketId(p.socket_id),
+    : ClockedObject(p), 
+      instCnt(0), 
+      amxAccl(p.amx_accl), // Initialize the pointer from Python
+      _cpuId(p.cpu_id), _socketId(p.socket_id),
       _instRequestorId(p.system->getRequestorId(this, "inst")),
       _dataRequestorId(p.system->getRequestorId(this, "data")),
       _taskId(context_switch_task_id::Unknown), _pid(invldPid),

@@ -11,6 +11,9 @@ from gem5.simulate.exit_event import ExitEvent
 from gem5.simulate.simulator import Simulator
 from gem5.isas import ISA
 
+# Import your newly compiled SimObject
+from m5.objects import AmxAccl
+
 # Standard libraries
 from pathlib import Path
 import m5.debug
@@ -22,15 +25,15 @@ $ ./gem5.debug -rs amx/tb.py
 '''
 
 # Define the path to your compiled test binary containing the custom instructions
-binary_path = Path("amx/load_test")
+binary_path = Path("amx-workloads/load_test")
 
 # Setup Cache and Memory
 cache_hierarchy = PrivateL1CacheHierarchy(
-    l1d_size="64kB",
-    l1i_size="64kB",
+    l1d_size="64KiB",
+    l1i_size="64KiB",
 )
 
-memory = SingleChannelDDR4_2400("1GB")
+memory = SingleChannelDDR4_2400("1GiB")
 
 # Setup the processor
 # (CPUTypes.ATOMIC is faster for purely functional tests, but TIMING is better if you need cycle counts)
@@ -49,6 +52,13 @@ board = SimpleBoard(
     cache_hierarchy=cache_hierarchy,
 )
 
+# attach the AMX Accelerator to the CPU(s)
+# the SimpleProcessor wraps the actual CPU SimObjects.
+# we iterate through the cores and attach our accelerator
+# directly to the underlying BaseCPU (core.core).
+for core in processor.cores:
+    core.core.amx_accl = AmxAccl()
+
 # Setup Workload
 board.set_se_binary_workload(
     binary=BinaryResource(
@@ -56,15 +66,20 @@ board.set_se_binary_workload(
     )
 )
 
+# ./[path to gem5] --debug-help gives more flag that we can use
+
 
 def workbegin_handler():
-    print("\n--- Start of AMX instruction ---\n")
+    print("\n--- Start of AMX isnstruction ---\n")
 
     # Enable ExecAll here to trace instructions ONLY in your region of interest
     # This prevents the terminal from being flooded with standard C-library setup instructions.
-    m5.debug.flags["ExecAll"].enable()
+    # m5.debug.flags["ExecAll"].enable()
     m5.debug.flags["Cache"].enable()
     m5.debug.flags["PseudoInst"].enable()
+
+    # Enable our custom AMX debug flag to see the DPRINTF output
+    m5.debug.flags["AMX"].enable()
 
     yield False  # Yielding False tells the simulator to continue running
 
@@ -73,9 +88,10 @@ def workend_handler():
     print("\n--- End of AMX instruction ---\n")
 
     # Disable tracing once the work is done
-    m5.debug.flags["ExecAll"].disable()
+    # m5.debug.flags["ExecAll"].disable()
     m5.debug.flags["Cache"].disable()
     m5.debug.flags["PseudoInst"].disable()
+    m5.debug.flags["AMX"].disable()
 
     yield False  # Yielding False tells the simulator to continue running
 

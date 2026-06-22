@@ -12,18 +12,18 @@ make
 ### 2. Build gem5 & m5ops
 
 
-i) gem5: 
+i) gem5 (from the project folder): 
 ```bash 
-cd gem5 && scons build/{ISA}/gem5.{variant} -j {cpus}
+cd gem5 && scons build/X86/gem5.opt -j {cpus}
 ```
 
-ii) m5ops: 
+ii) m5ops (from the gem5 folder / after running the 1st command): 
 ```bash
-cd util/m5 && scons build/{TARGET_ISA}/out/m5 '
+cd util/m5 && scons build/x86/out/m5
 ```
 
 ### 3. Run Simulation
 
 ``` bash
-./path-to-gem5-build -rs amx/tb.py
+./gem5/build/X86/gem5.opt -rs amx-workloads/tb.py
 ```

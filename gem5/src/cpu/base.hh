@@ -69,6 +69,8 @@ class CheckerCPU;
 class ThreadContext;
 class System;
 
+class AmxAccl; // mbits
+
 struct AddressMonitor
 {
     AddressMonitor();
@@ -110,6 +112,10 @@ class BaseCPU : public ClockedObject
     /// Instruction count used for SPARC misc register
     /// @todo unify this with the counters that cpus individually keep
     Tick instCnt;
+
+    // mbits
+    // Pointer to the AMX Accelerator
+    AmxAccl* amxAccl;
 
     // every cpu has an id, put it in the base cpu
     // Set at initialization, only time a cpuId might change is during a
@@ -192,6 +198,9 @@ class BaseCPU : public ClockedObject
     SignalSinkPort<bool> modelResetPort;
 
   public:
+    // mbits
+    // Getter function so the m5op handler can retrieve it
+    AmxAccl* getAmxAccl() const { return amxAccl; }
 
     /**
      * Purely virtual method that returns a reference to the data

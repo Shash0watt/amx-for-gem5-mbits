@@ -1,0 +1,6 @@
+Import('*')
+
+SimObject('AmxAccl.py', sim_objects=['AmxAccl'])
+Source('amx_accl.cc')
+DebugFlag('AMX')
+# custom debug flag for AMX

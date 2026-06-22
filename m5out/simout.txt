@@ -2,93 +2,64 @@ gem5 Simulator System.  https://www.gem5.org
 gem5 is copyrighted software; use the --copyright option for details.
 
 gem5 version 25.1.0.1
-gem5 compiled Jun 16 2026 15:25:48
-gem5 started Jun 16 2026 15:35:57
-gem5 executing on mbit10, pid 4173580
-command line: ./gem5.debug -rs /avx/test_bench.py
+gem5 compiled Jun 22 2026 16:56:05
+gem5 started Jun 22 2026 16:58:11
+gem5 executing on mbit10, pid 595201
+command line: ./gem5/build/X86/gem5.opt -rs amx-workloads/tb.py
 
-Script /avx/test_bench.py not found
-Usage
-=====
-  gem5.debug [gem5 options] script.py [script options]
+Starting SE Simulation for: load_test
+Global frequency set at 1000000000000 ticks per second
+warn: No dot file generated. Please install pydot to generate the dot file and pdf.
+src/mem/dram_interface.cc:690: warn: DRAM device capacity (16384 Mbytes) does not match the address range assigned (1024 Mbytes)
+src/base/statistics.hh:279: warn: One of the stats is a legacy stat. Legacy stat is a stat that does not belong to any statistics::Group. Legacy stat is deprecated.
+board.remote_gdb: Listening for connections on port 7000
+src/sim/mem_state.cc:443: info: Increasing stack size by one page.
+src/sim/syscall_emul.cc:86: warn: ignoring syscall set_robust_list(...)
+src/sim/syscall_emul.cc:86: warn: ignoring syscall rseq(...)
+src/sim/syscall_emul.cc:86: warn: ignoring syscall mprotect(...)
+src/sim/syscall_emul.cc:86: warn: ignoring syscall mprotect(...)
+src/sim/syscall_emul.cc:86: warn: ignoring syscall mprotect(...)
 
-gem5 is copyrighted software; use the --copyright option for details.
+--- Start of AMX isnstruction ---
 
-Options
-=======
---help, -h              show this help message and exit
---build-info, -B        Show build information
---copyright, -C         Show full copyright information
---readme, -R            Show the readme
---outdir=DIR, -d DIR    Set the output directory to DIR [Default: m5out]
---redirect-stdout, -r   Redirect stdout (& stderr, without -e) to file
---redirect-stderr, -e   Redirect stderr to file
---silent-redirect       Suppress printing a message when redirecting stdout or
-                        stderr
---stdout-file=FILE      Filename for -r redirection [Default: simout.txt]
---stderr-file=FILE      Filename for -e redirection [Default: simerr.txt]
---listener-mode={on,off,auto}
-                        Port (e.g., gdb) listener mode (auto: Enable if
-                        running interactively) [Default: auto]
---allow-remote-connections
-                        Port listeners will accept connections from anywhere
-                        (0.0.0.0). Default is only localhost.
---interactive, -i       Invoke the interactive interpreter after running the
-                        script
---pdb                   Invoke the python debugger before running the script
---path=PATH[:PATH], -p PATH[:PATH]
-                        Prepend PATH to the system path when invoking the
-                        script
---quiet, -q             Reduce verbosity
---verbose, -v           Increase verbosity
--m mod                  run library module as a script (terminates option
-                        list)
--c cmd                  program passed in as string (terminates option list)
--P                      Don't prepend the script directory to the system path.
-                        Mimics Python 3's `-P` option.
--s                      IGNORED, only for compatibility with python. don'tadd
-                        user site directory to sys.path; also PYTHONNOUSERSITE
+261919000: board.cache_hierarchy.l1dcaches: access for ReadReq [3fce8:3fcef] hit state: e (M) writable: 1 readable: 1 dirty: 1 prefetched: 0 | tag: 0x1f secure: 0 valid: 1 | set: 0x73 way: 0x3
+261920000: board.cache_hierarchy.l1icaches: access for ReadReq [1198:119f] IF hit state: 6 (E) writable: 1 readable: 1 dirty: 0 prefetched: 0 | tag: 0 secure: 0 valid: 1 | set: 0x46 way: 0x7
+261921000: board.cache_hierarchy.l1icaches: access for ReadReq [11a0:11a7] IF hit state: 6 (E) writable: 1 readable: 1 dirty: 0 prefetched: 0 | tag: 0 secure: 0 valid: 1 | set: 0x46 way: 0x7
+261922000: board.cache_hierarchy.l1dcaches: access for ReadReq [3fd08:3fd0f] hit state: e (M) writable: 1 readable: 1 dirty: 1 prefetched: 0 | tag: 0x1f secure: 0 valid: 1 | set: 0x74 way: 0x5
+261923000: board.cache_hierarchy.l1icaches: access for ReadReq [11a0:11a7] IF hit state: 6 (E) writable: 1 readable: 1 dirty: 0 prefetched: 0 | tag: 0 secure: 0 valid: 1 | set: 0x46 way: 0x7
+261924000: board.cache_hierarchy.l1dcaches: access for ReadReq [3fd00:3fd07] hit state: e (M) writable: 1 readable: 1 dirty: 1 prefetched: 0 | tag: 0x1f secure: 0 valid: 1 | set: 0x74 way: 0x5
+261925000: board.cache_hierarchy.l1icaches: access for ReadReq [11a0:11a7] IF hit state: 6 (E) writable: 1 readable: 1 dirty: 0 prefetched: 0 | tag: 0 secure: 0 valid: 1 | set: 0x46 way: 0x7
+261926000: board.cache_hierarchy.l1icaches: access for ReadReq [11a8:11af] IF hit state: 6 (E) writable: 1 readable: 1 dirty: 0 prefetched: 0 | tag: 0 secure: 0 valid: 1 | set: 0x46 way: 0x7
+261927000: board.cache_hierarchy.l1dcaches: access for ReadReq [3fcf0:3fcf7] hit state: e (M) writable: 1 readable: 1 dirty: 1 prefetched: 0 | tag: 0x1f secure: 0 valid: 1 | set: 0x73 way: 0x3
+261928000: board.cache_hierarchy.l1icaches: access for ReadReq [11a8:11af] IF hit state: 6 (E) writable: 1 readable: 1 dirty: 0 prefetched: 0 | tag: 0 secure: 0 valid: 1 | set: 0x46 way: 0x7
+261929000: board.cache_hierarchy.l1icaches: access for ReadReq [11a8:11af] IF hit state: 6 (E) writable: 1 readable: 1 dirty: 0 prefetched: 0 | tag: 0 secure: 0 valid: 1 | set: 0x46 way: 0x7
+261930000: board.cache_hierarchy.l1icaches: access for ReadReq [11b0:11b7] IF hit state: 6 (E) writable: 1 readable: 1 dirty: 0 prefetched: 0 | tag: 0 secure: 0 valid: 1 | set: 0x46 way: 0x7
+261931000: board.cache_hierarchy.l1icaches: access for ReadReq [11b0:11b7] IF hit state: 6 (E) writable: 1 readable: 1 dirty: 0 prefetched: 0 | tag: 0 secure: 0 valid: 1 | set: 0x46 way: 0x7
+261932000: board.cache_hierarchy.l1dcaches: access for WriteReq [3fce8:3fcef] hit state: e (M) writable: 1 readable: 1 dirty: 1 prefetched: 0 | tag: 0x1f secure: 0 valid: 1 | set: 0x73 way: 0x3
+261933000: board.cache_hierarchy.l1icaches: access for ReadReq [1260:1267] IF hit state: 6 (E) writable: 1 readable: 1 dirty: 0 prefetched: 0 | tag: 0 secure: 0 valid: 1 | set: 0x49 way: 0x7
+261934000: board.cache_hierarchy.l1icaches: access for ReadReq [1268:126f] IF hit state: 6 (E) writable: 1 readable: 1 dirty: 0 prefetched: 0 | tag: 0 secure: 0 valid: 1 | set: 0x49 way: 0x7
+261935000: global: pseudo_inst::pseudoInst(99)
+261935000: global: bringing data into cache
+261935000: board.processor.cores.core.amx_accl: Received amxLoadd! Dest: 0, Src: 140737488350480, Stride: 64
+261935000: board.cache_hierarchy.l1icaches: access for ReadReq [1268:126f] IF hit state: 6 (E) writable: 1 readable: 1 dirty: 0 prefetched: 0 | tag: 0 secure: 0 valid: 1 | set: 0x49 way: 0x7
+261936000: board.cache_hierarchy.l1dcaches: access for ReadReq [3fce8:3fcef] hit state: e (M) writable: 1 readable: 1 dirty: 1 prefetched: 0 | tag: 0x1f secure: 0 valid: 1 | set: 0x73 way: 0x3
+261937000: board.cache_hierarchy.l1icaches: access for ReadReq [11b0:11b7] IF hit state: 6 (E) writable: 1 readable: 1 dirty: 0 prefetched: 0 | tag: 0 secure: 0 valid: 1 | set: 0x46 way: 0x7
+261938000: board.cache_hierarchy.l1icaches: access for ReadReq [11b8:11bf] IF hit state: 6 (E) writable: 1 readable: 1 dirty: 0 prefetched: 0 | tag: 0 secure: 0 valid: 1 | set: 0x46 way: 0x7
+261939000: board.cache_hierarchy.l1icaches: access for ReadReq [11b8:11bf] IF hit state: 6 (E) writable: 1 readable: 1 dirty: 0 prefetched: 0 | tag: 0 secure: 0 valid: 1 | set: 0x46 way: 0x7
+261940000: board.cache_hierarchy.l1icaches: access for ReadReq [11c0:11c7] IF miss
+261941000: board.cache_hierarchy.l1icaches: sendMSHRQueuePacket: MSHR ReadReq [11c0:11c7] IF
+261941000: board.cache_hierarchy.l1icaches: createMissPacket: created ReadSharedReq [11c0:11ff] IF from ReadReq [11c0:11c7] IF
+261989000: board.cache_hierarchy.l1icaches: recvTimingResp: Handling response ReadResp [11c0:11ff] IF
+261989000: board.cache_hierarchy.l1icaches: Block for addr 0x11c0 being updated in Cache
+261989000: board.cache_hierarchy.l1icaches: Create Writeback WritebackClean [d1c0:d1ff] writable: 1, dirty: 0
+261989000: board.cache_hierarchy.l1icaches: Block addr 0x11c0 (ns) moving from  to state: 6 (E) writable: 1 readable: 1 dirty: 0 prefetched: 0 | tag: 0 secure: 0 valid: 1 | set: 0x47 way: 0x5
+261990000: board.cache_hierarchy.l1icaches: sendWriteQueuePacket: write WritebackClean [d1c0:d1ff]
+261990000: board.cache_hierarchy.l1dcaches: access for WriteReq [3fce8:3fcef] hit state: e (M) writable: 1 readable: 1 dirty: 1 prefetched: 0 | tag: 0x1f secure: 0 valid: 1 | set: 0x73 way: 0x3
+261991000: board.cache_hierarchy.l1icaches: access for ReadReq [1250:1257] IF hit state: 6 (E) writable: 1 readable: 1 dirty: 0 prefetched: 0 | tag: 0 secure: 0 valid: 1 | set: 0x49 way: 0x7
+261992000: global: pseudo_inst::pseudoInst(91)
+261992000: global: pseudo_inst::workend(0, 0)
+261992000: board.cache_hierarchy.l1icaches: access for ReadReq [1250:1257] IF hit state: 6 (E) writable: 1 readable: 1 dirty: 0 prefetched: 0 | tag: 0 secure: 0 valid: 1 | set: 0x49 way: 0x7
 
-Statistics Options
-------------------
---stats-file=FILE       Append additional file for statistics output (Defaults
-                        to stats.txt if unset)
---stats-help            Display documentation for available stat visitors
+--- End of AMX instruction ---
 
-Configuration Options
----------------------
---dump-config=FILE      Dump configuration output file [Default: config.ini]
---json-config=FILE      Create JSON output of the configuration [Default:
-                        config.json]
---dot-config=FILE       Create DOT & pdf outputs of the configuration
-                        [Default: config.dot]
---dot-dvfs-config=FILE  Create DOT & pdf outputs of the DVFS configuration
-                        [Default: none]
-
-Debugging Options
------------------
---debug-break=TICK[,TICK]
-                        Create breakpoint(s) at TICK(s) (kills process if no
-                        debugger attached)
---debug-help            Print help on debug flags
---debug-flags=FLAG[,FLAG]
-                        Sets the flags for debug output (-FLAG disables a
-                        flag)
---debug-start=TICK      Start debug output at TICK
---debug-end=TICK        End debug output at TICK
---debug-file=FILE       Sets the output file for debug. Append '.gz' to the
-                        name for it to be compressed automatically [Default:
-                        cout]
---debug-activate=EXPR[,EXPR]
-                        Activate EXPR sim objects
---debug-ignore=EXPR     Ignore EXPR sim objects
---remote-gdb-port=REMOTE_GDB_PORT
-                        Remote gdb base port (set to 0 to disable listening)
---show-exit-event-messages
-                        Print information about exit events and when they
-                        occur
-
-Help Options
-------------
---list-sim-objects      List all built-in SimObjects, their params and default
-                        values
+Simulation Done

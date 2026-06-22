@@ -745,6 +745,13 @@
                         "cxx_class": "gem5::TimingSimpleCPU",
                         "name": "core",
                         "path": "board.processor.cores.core",
+                        "amx_accl": {
+                            "type": "AmxAccl",
+                            "cxx_class": "gem5::AmxAccl",
+                            "name": "amx_accl",
+                            "path": "board.processor.cores.core.amx_accl",
+                            "eventq_index": 0
+                        },
                         "branchPred": null,
                         "checker": null,
                         "clk_domain": "board.clk_domain",
@@ -1006,7 +1013,7 @@
                                 "name": "workload",
                                 "path": "board.processor.cores.core.workload",
                                 "cmd": [
-                                    "/home/sjaguri/gem5-amx/avx/load_test"
+                                    "amx-workloads/load_test"
                                 ],
                                 "cwd": "/home/sjaguri/gem5-amx",
                                 "drivers": [],
@@ -1015,7 +1022,7 @@
                                 "errout": "cerr",
                                 "euid": 100,
                                 "eventq_index": 0,
-                                "executable": "/home/sjaguri/gem5-amx/avx/load_test",
+                                "executable": "amx-workloads/load_test",
                                 "gid": 100,
                                 "input": "cin",
                                 "kvmInSE": false,

@@ -62,6 +62,9 @@ class BaseCPU(ClockedObject):
     cxx_header = "cpu/base.hh"
     cxx_class = "gem5::BaseCPU"
 
+    # mbits addition for AMX support through the CPU
+    amx_accl = Param.AmxAccl(NULL, "AMX Accelerator attached to this core")
+
     cxx_exports = [
         PyBindMethod("switchOut"),
         PyBindMethod("takeOverFrom"),
