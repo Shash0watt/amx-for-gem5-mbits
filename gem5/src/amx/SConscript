@@ -1,6 +1,9 @@
 Import('*')
 
+# define sim object from AmxAccl.py as AmxAccl
 SimObject('AmxAccl.py', sim_objects=['AmxAccl'])
+# declaring amx_accl as the src filke
 Source('amx_accl.cc')
+# create a debug flag for the AMX object
 DebugFlag('AMX')
 # custom debug flag for AMX

@@ -20,10 +20,10 @@
         "exit_on_work_items": true,
         "external_memory_ranges": [],
         "init_param": 0,
-        "m5ops_base": 4294901760,
+        "m5ops_base": 8589934592,
         "mem_mode": "timing",
         "mem_ranges": [
-            "0:1073741824"
+            "0:8589934592"
         ],
         "memories": [
             "board.memory.mem_ctrl.dram"
@@ -225,7 +225,7 @@
                     "writeback_clean": false,
                     "cpu_side": {
                         "role": "GEM5 RESPONDER",
-                        "peer": "board.processor.cores.core.dcache_port",
+                        "peer": "board.processor.cores.amx_l1_xbar.mem_side_ports[0]",
                         "is_source": "False"
                     },
                     "mem_side": {
@@ -634,7 +634,7 @@
                             "leaders": [],
                             "possible_states": []
                         },
-                        "range": "0:1073741824",
+                        "range": "0:8589934592",
                         "ranks_per_channel": 2,
                         "read_buffer_size": 64,
                         "tAAD": 833,
@@ -740,6 +740,56 @@
                     "path": "board.processor.cores",
                     "eventq_index": 0,
                     "thermal_domain": null,
+                    "amx_l1_xbar": {
+                        "type": "CoherentXBar",
+                        "cxx_class": "gem5::CoherentXBar",
+                        "name": "amx_l1_xbar",
+                        "path": "board.processor.cores.amx_l1_xbar",
+                        "clk_domain": "board.clk_domain",
+                        "eventq_index": 0,
+                        "forward_latency": 1,
+                        "frontend_latency": 1,
+                        "header_latency": 1,
+                        "max_outstanding_snoops": 512,
+                        "max_routing_table_size": 512,
+                        "point_of_coherency": false,
+                        "point_of_unification": false,
+                        "power_model": [],
+                        "power_state": {
+                            "type": "PowerState",
+                            "cxx_class": "gem5::PowerState",
+                            "name": "power_state",
+                            "path": "board.processor.cores.amx_l1_xbar.power_state",
+                            "clk_gate_bins": 20,
+                            "clk_gate_max": 1000000000000,
+                            "clk_gate_min": 1000,
+                            "default_state": "UNDEFINED",
+                            "eventq_index": 0,
+                            "leaders": [],
+                            "possible_states": []
+                        },
+                        "response_latency": 1,
+                        "snoop_filter": null,
+                        "snoop_response_latency": 1,
+                        "system": "board",
+                        "use_default_range": false,
+                        "width": 64,
+                        "cpu_side_ports": {
+                            "role": "GEM5 RESPONDER",
+                            "peer": [
+                                "board.processor.cores.core.dcache_port",
+                                "board.processor.cores.core.amx_accl.mem_side"
+                            ],
+                            "is_source": "False"
+                        },
+                        "mem_side_ports": {
+                            "role": "GEM5 REQUESTOR",
+                            "peer": [
+                                "board.cache_hierarchy.l1dcaches.cpu_side"
+                            ],
+                            "is_source": "True"
+                        }
+                    },
                     "core": {
                         "type": "BaseTimingSimpleCPU",
                         "cxx_class": "gem5::TimingSimpleCPU",
@@ -750,7 +800,12 @@
                             "cxx_class": "gem5::AmxAccl",
                             "name": "amx_accl",
                             "path": "board.processor.cores.core.amx_accl",
-                            "eventq_index": 0
+                            "eventq_index": 0,
+                            "mem_side": {
+                                "role": "GEM5 REQUESTOR",
+                                "peer": "board.processor.cores.amx_l1_xbar.cpu_side_ports[1]",
+                                "is_source": "True"
+                            }
                         },
                         "branchPred": null,
                         "checker": null,
@@ -1041,7 +1096,7 @@
                         ],
                         "dcache_port": {
                             "role": "GEM5 REQUESTOR",
-                            "peer": "board.cache_hierarchy.l1dcaches.cpu_side",
+                            "peer": "board.processor.cores.amx_l1_xbar.cpu_side_ports[0]",
                             "is_source": "True"
                         },
                         "icache_port": {

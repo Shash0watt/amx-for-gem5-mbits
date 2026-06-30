@@ -27,3 +27,17 @@ cd util/m5 && scons build/x86/out/m5
 ``` bash
 ./gem5/build/X86/gem5.opt -rs amx-workloads/tb.py
 ```
+
+
+### (for me) check server usage
+
+- see users server
+``` bash
+w
+```
+
+- see summary of usage
+``` bash
+ps aux | awk '{arr[$1]+=$3; arr2[$1]+=$4} END {for (i in arr) print i, "CPU%:", arr[i], "MEM%:", arr2[i]}' | sort -nk3
+```
+

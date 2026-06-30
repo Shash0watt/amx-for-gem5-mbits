@@ -2,15 +2,15 @@ gem5 Simulator System.  https://www.gem5.org
 gem5 is copyrighted software; use the --copyright option for details.
 
 gem5 version 25.1.0.1
-gem5 compiled Jun 22 2026 16:56:05
-gem5 started Jun 22 2026 16:58:11
-gem5 executing on mbit10, pid 595201
-command line: ./gem5/build/X86/gem5.opt -rs amx-workloads/tb.py
+gem5 compiled Jun 26 2026 11:59:32
+gem5 started Jun 26 2026 12:04:06
+gem5 executing on mbit10, pid 3218962
+command line: ./gem5/build/X86/gem5.opt -rs amx-workloads/ltb.py
 
 Starting SE Simulation for: load_test
 Global frequency set at 1000000000000 ticks per second
 warn: No dot file generated. Please install pydot to generate the dot file and pdf.
-src/mem/dram_interface.cc:690: warn: DRAM device capacity (16384 Mbytes) does not match the address range assigned (1024 Mbytes)
+src/mem/dram_interface.cc:690: warn: DRAM device capacity (16384 Mbytes) does not match the address range assigned (8192 Mbytes)
 src/base/statistics.hh:279: warn: One of the stats is a legacy stat. Legacy stat is a stat that does not belong to any statistics::Group. Legacy stat is deprecated.
 board.remote_gdb: Listening for connections on port 7000
 src/sim/mem_state.cc:443: info: Increasing stack size by one page.
@@ -20,46 +20,16 @@ src/sim/syscall_emul.cc:86: warn: ignoring syscall mprotect(...)
 src/sim/syscall_emul.cc:86: warn: ignoring syscall mprotect(...)
 src/sim/syscall_emul.cc:86: warn: ignoring syscall mprotect(...)
 
---- Start of AMX isnstruction ---
+--- Start of AMX ROI (workbegin) ---
 
-261919000: board.cache_hierarchy.l1dcaches: access for ReadReq [3fce8:3fcef] hit state: e (M) writable: 1 readable: 1 dirty: 1 prefetched: 0 | tag: 0x1f secure: 0 valid: 1 | set: 0x73 way: 0x3
-261920000: board.cache_hierarchy.l1icaches: access for ReadReq [1198:119f] IF hit state: 6 (E) writable: 1 readable: 1 dirty: 0 prefetched: 0 | tag: 0 secure: 0 valid: 1 | set: 0x46 way: 0x7
-261921000: board.cache_hierarchy.l1icaches: access for ReadReq [11a0:11a7] IF hit state: 6 (E) writable: 1 readable: 1 dirty: 0 prefetched: 0 | tag: 0 secure: 0 valid: 1 | set: 0x46 way: 0x7
-261922000: board.cache_hierarchy.l1dcaches: access for ReadReq [3fd08:3fd0f] hit state: e (M) writable: 1 readable: 1 dirty: 1 prefetched: 0 | tag: 0x1f secure: 0 valid: 1 | set: 0x74 way: 0x5
-261923000: board.cache_hierarchy.l1icaches: access for ReadReq [11a0:11a7] IF hit state: 6 (E) writable: 1 readable: 1 dirty: 0 prefetched: 0 | tag: 0 secure: 0 valid: 1 | set: 0x46 way: 0x7
-261924000: board.cache_hierarchy.l1dcaches: access for ReadReq [3fd00:3fd07] hit state: e (M) writable: 1 readable: 1 dirty: 1 prefetched: 0 | tag: 0x1f secure: 0 valid: 1 | set: 0x74 way: 0x5
-261925000: board.cache_hierarchy.l1icaches: access for ReadReq [11a0:11a7] IF hit state: 6 (E) writable: 1 readable: 1 dirty: 0 prefetched: 0 | tag: 0 secure: 0 valid: 1 | set: 0x46 way: 0x7
-261926000: board.cache_hierarchy.l1icaches: access for ReadReq [11a8:11af] IF hit state: 6 (E) writable: 1 readable: 1 dirty: 0 prefetched: 0 | tag: 0 secure: 0 valid: 1 | set: 0x46 way: 0x7
-261927000: board.cache_hierarchy.l1dcaches: access for ReadReq [3fcf0:3fcf7] hit state: e (M) writable: 1 readable: 1 dirty: 1 prefetched: 0 | tag: 0x1f secure: 0 valid: 1 | set: 0x73 way: 0x3
-261928000: board.cache_hierarchy.l1icaches: access for ReadReq [11a8:11af] IF hit state: 6 (E) writable: 1 readable: 1 dirty: 0 prefetched: 0 | tag: 0 secure: 0 valid: 1 | set: 0x46 way: 0x7
-261929000: board.cache_hierarchy.l1icaches: access for ReadReq [11a8:11af] IF hit state: 6 (E) writable: 1 readable: 1 dirty: 0 prefetched: 0 | tag: 0 secure: 0 valid: 1 | set: 0x46 way: 0x7
-261930000: board.cache_hierarchy.l1icaches: access for ReadReq [11b0:11b7] IF hit state: 6 (E) writable: 1 readable: 1 dirty: 0 prefetched: 0 | tag: 0 secure: 0 valid: 1 | set: 0x46 way: 0x7
-261931000: board.cache_hierarchy.l1icaches: access for ReadReq [11b0:11b7] IF hit state: 6 (E) writable: 1 readable: 1 dirty: 0 prefetched: 0 | tag: 0 secure: 0 valid: 1 | set: 0x46 way: 0x7
-261932000: board.cache_hierarchy.l1dcaches: access for WriteReq [3fce8:3fcef] hit state: e (M) writable: 1 readable: 1 dirty: 1 prefetched: 0 | tag: 0x1f secure: 0 valid: 1 | set: 0x73 way: 0x3
-261933000: board.cache_hierarchy.l1icaches: access for ReadReq [1260:1267] IF hit state: 6 (E) writable: 1 readable: 1 dirty: 0 prefetched: 0 | tag: 0 secure: 0 valid: 1 | set: 0x49 way: 0x7
-261934000: board.cache_hierarchy.l1icaches: access for ReadReq [1268:126f] IF hit state: 6 (E) writable: 1 readable: 1 dirty: 0 prefetched: 0 | tag: 0 secure: 0 valid: 1 | set: 0x49 way: 0x7
-261935000: global: pseudo_inst::pseudoInst(99)
-261935000: global: bringing data into cache
-261935000: board.processor.cores.core.amx_accl: Received amxLoadd! Dest: 0, Src: 140737488350480, Stride: 64
-261935000: board.cache_hierarchy.l1icaches: access for ReadReq [1268:126f] IF hit state: 6 (E) writable: 1 readable: 1 dirty: 0 prefetched: 0 | tag: 0 secure: 0 valid: 1 | set: 0x49 way: 0x7
-261936000: board.cache_hierarchy.l1dcaches: access for ReadReq [3fce8:3fcef] hit state: e (M) writable: 1 readable: 1 dirty: 1 prefetched: 0 | tag: 0x1f secure: 0 valid: 1 | set: 0x73 way: 0x3
-261937000: board.cache_hierarchy.l1icaches: access for ReadReq [11b0:11b7] IF hit state: 6 (E) writable: 1 readable: 1 dirty: 0 prefetched: 0 | tag: 0 secure: 0 valid: 1 | set: 0x46 way: 0x7
-261938000: board.cache_hierarchy.l1icaches: access for ReadReq [11b8:11bf] IF hit state: 6 (E) writable: 1 readable: 1 dirty: 0 prefetched: 0 | tag: 0 secure: 0 valid: 1 | set: 0x46 way: 0x7
-261939000: board.cache_hierarchy.l1icaches: access for ReadReq [11b8:11bf] IF hit state: 6 (E) writable: 1 readable: 1 dirty: 0 prefetched: 0 | tag: 0 secure: 0 valid: 1 | set: 0x46 way: 0x7
-261940000: board.cache_hierarchy.l1icaches: access for ReadReq [11c0:11c7] IF miss
-261941000: board.cache_hierarchy.l1icaches: sendMSHRQueuePacket: MSHR ReadReq [11c0:11c7] IF
-261941000: board.cache_hierarchy.l1icaches: createMissPacket: created ReadSharedReq [11c0:11ff] IF from ReadReq [11c0:11c7] IF
-261989000: board.cache_hierarchy.l1icaches: recvTimingResp: Handling response ReadResp [11c0:11ff] IF
-261989000: board.cache_hierarchy.l1icaches: Block for addr 0x11c0 being updated in Cache
-261989000: board.cache_hierarchy.l1icaches: Create Writeback WritebackClean [d1c0:d1ff] writable: 1, dirty: 0
-261989000: board.cache_hierarchy.l1icaches: Block addr 0x11c0 (ns) moving from  to state: 6 (E) writable: 1 readable: 1 dirty: 0 prefetched: 0 | tag: 0 secure: 0 valid: 1 | set: 0x47 way: 0x5
-261990000: board.cache_hierarchy.l1icaches: sendWriteQueuePacket: write WritebackClean [d1c0:d1ff]
-261990000: board.cache_hierarchy.l1dcaches: access for WriteReq [3fce8:3fcef] hit state: e (M) writable: 1 readable: 1 dirty: 1 prefetched: 0 | tag: 0x1f secure: 0 valid: 1 | set: 0x73 way: 0x3
-261991000: board.cache_hierarchy.l1icaches: access for ReadReq [1250:1257] IF hit state: 6 (E) writable: 1 readable: 1 dirty: 0 prefetched: 0 | tag: 0 secure: 0 valid: 1 | set: 0x49 way: 0x7
-261992000: global: pseudo_inst::pseudoInst(91)
-261992000: global: pseudo_inst::workend(0, 0)
-261992000: board.cache_hierarchy.l1icaches: access for ReadReq [1250:1257] IF hit state: 6 (E) writable: 1 readable: 1 dirty: 0 prefetched: 0 | tag: 0 secure: 0 valid: 1 | set: 0x49 way: 0x7
+369818000: global: pseudo_inst::pseudoInst(99)
+369818000: board.processor.cores.core.amx_accl: Received amxLoadd! Dest: 0, Src: 140737488350480, Stride: 64
+369818000: board.processor.cores.core.amx_accl: Timing read request successfully sent for physical address 0x3fd00
+369822000: board.processor.cores.core.amx_accl.mem_side: Port callback: A timing response packet has arrived from the cache!
+369822000: board.processor.cores.core.amx_accl.mem_side: Data loaded into cache line (as int8): [ 16 -19 -1 -1 -1 127 0 0 64 0 0 0 0 0 0 0 12 0 0 0 12 0 0 0 13 0 0 0 13 0 0 0 14 0 0 0 -1 127 0 0 0 0 0 0 0 0 0 0 -48 -19 -1 -1 -1 127 0 0 -54 113 -33 -9 -1 127 0 0 ]
+369882000: global: pseudo_inst::pseudoInst(91)
+369882000: global: pseudo_inst::workend(0, 0)
 
---- End of AMX instruction ---
+--- End of AMX ROI (workend) ---
 
 Simulation Done

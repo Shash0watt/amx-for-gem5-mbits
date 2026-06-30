@@ -9,7 +9,7 @@ int main()
     // setup the variables in cpp
     uint64_t dest_tile = 0;
 
-    int data[4] = {7, 8, 9, 10};
+    int data[5] = {12,12,13,13,14};
     int *data_ptr = data;
     uint64_t src_mem = reinterpret_cast<uint64_t>(data_ptr);
 

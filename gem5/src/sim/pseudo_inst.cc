@@ -622,20 +622,13 @@ m5Hypercall(ThreadContext *tc, uint64_t hypercall_id)
 void
 amxLoadd(ThreadContext *tc, uint64_t dest_tile, uint64_t src_mem, size_t stride)
 {
-    DPRINTF(PseudoInst, "bringing data into cache\n");
-
-    // Get the base CPU pointer through thread context
     BaseCPU *cpu = tc->getCpuPtr();
-    
-    // Retrieve the attached accelerator
     AmxAccl *accl = cpu->getAmxAccl();
 
     if (accl) {
-        // Handoff to the accelerator
-        accl->startAmxLoad(dest_tile, src_mem, stride);
+        accl->startAmxLoad(tc, dest_tile, src_mem, stride);
     } else {
-        // It's good practice to warn if the m5op is called but hardware is missing
-        warn("amxLoadd executed, but no AMX Accelerator is attached to this CPU!");
+        warn("amxLoadd executed, but no AMX Accelerator is attached!");
     }
 }
 

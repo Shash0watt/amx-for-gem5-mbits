@@ -10,24 +10,21 @@
 namespace gem5
 {
 
-AmxAccl::AmxAccl(const AmxAcclParams &amp;params) :
-    ClockedObject(params), 
-    amxMemPort(params.name + ".mem_side_port", this) // port constructor call
+AmxAccl::AmxAccl(const AmxAcclParams &params) :
+    SimObject(params), 
+    memPort(params.name + ".mem_side", this) // port constructor
 {
-    std::memset(&currentCfg, 0, sizeof(TileCfg));
-    std::memset(tiles, 0, sizeof(tiles));
-
     DPRINTF(AMX, "Created the AMX object\n");
 }
 
 // connect Python ports to C++ ports
-Port &amp;
-AmxAccl::getPort(const std::string &amp;if_name, PortID idx)
+Port &
+AmxAccl::getPort(const std::string &if_name, PortID idx)
 {
-    if (if_name == "mem_side_port") {
-        return amxMemPort; // return our port object
+    if (if_name == "mem_side") {
+        return memPort;
     }
-    return ClockedObject::getPort(if_name, idx);
+    return SimObject::getPort(if_name, idx);
 }
 
 // wake up notification from the cache
@@ -42,37 +39,7 @@ bool
 AmxAccl::AmxMemPort::recvTimingResp(PacketPtr pkt)
 {
     DPRINTF(AMX, "Port callback: A timing response packet has arrived from the cache!\n");
-
-    if (pkt->isError()) {
-        DPRINTF(AMX, "Packet returned with an ERROR status! Destination Address was unmapped or faulty.\n");
-        
-        delete pkt;
-        return true; 
-    }
-
-    if (!pkt->hasData()) {
-        DPRINTF(AMX, "Packet arrived safely, but contains NO data payload to print.\n");
-        
-        delete pkt;
-        return true;
-    }
-
-    // Interpret the packet data buffer as signed 8-bit integers
-    int8_t *data_ptr = reinterpret_cast<int8_t*>(pkt->getPtr<uint8_t>());
-
-    std::string int8_output = "";
-    for (int i = 0; i < pkt->getSize(); i++) {
-        char buf[8];
-        // %d will print the signed values (ranging from -128 to 127)
-        snprintf(buf, sizeof(buf), "%d ", data_ptr[i]);
-        int8_output += buf;
-    }
-    
-    DPRINTF(AMX, "Data loaded into cache line (as int8): [ %s]\n", int8_output.c_str());
-
-    delete pkt;
-
-    return true; 
+    return true; // retrun true if we successfully processed/accepted the response
 }
 
 void
@@ -87,9 +54,12 @@ AmxAccl::startAmxLoad(ThreadContext *tc, uint64_t dest_tile, uint64_t src_mem, s
     DPRINTF(AMX, "Received amxLoadd! Dest: %llu, Src: %llu, Stride: %lu\n", 
             dest_tile, src_mem, stride);
 
+    // 1. Align the virtual address to a standard 64-byte cache line
     int cache_line_size = 64;     
-    uint64_t aligned_src_mem = src_mem &amp; ~(cache_line_size - 1);
+    uint64_t aligned_src_mem = src_mem & ~(cache_line_size - 1);
 
+    // 2. Construct a baseline master Request object
+    // We grab the RequestorID, instruction pointer, and context ID directly from the CPU thread.
     RequestPtr req = std::make_shared<Request>(
         aligned_src_mem,
         cache_line_size,
@@ -99,7 +69,7 @@ AmxAccl::startAmxLoad(ThreadContext *tc, uint64_t dest_tile, uint64_t src_mem, s
         tc->contextId()                    // The thread ID
     );
 
-    // perform a functional page-table walk translation 
+    // performa a functional page-table walk translation -- (is this how we want to do it? or should it be timing based?)
     Fault fault = tc->getMMUPtr()->translateFunctional(req, tc, BaseMMU::Read);
     if (fault != NoFault) {
         DPRINTF(AMX, "Translation failed for virtual address 0x%lx\n", src_mem);
@@ -108,16 +78,15 @@ AmxAccl::startAmxLoad(ThreadContext *tc, uint64_t dest_tile, uint64_t src_mem, s
 
     // make a Read Packet
     PacketPtr pkt = new Packet(req, MemCmd::ReadReq);
-    pkt->allocate(); // used to initialize a data buffer within the packet
+    pkt->allocate(); // used to intialize a data buffer within the packet
 
     // send the timing request through our structural memory port
     // sendTimingReq returns true if the cache accepts it, or false if it is blocked/busy.
-    if (amxMemPort.sendTimingReq(pkt)) { // Renamed variable reference
+    if (memPort.sendTimingReq(pkt)) {
         DPRINTF(AMX, "Timing read request successfully sent for physical address 0x%lx\n", 
                 req->getPaddr());
     } else {
         DPRINTF(AMX, "Cache rejected the timing request (busy). Retries are not handled yet!\n");
-        // TODO implement retrying if there is a cache miss!!!
         delete pkt;
     }
 }

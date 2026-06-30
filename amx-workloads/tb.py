@@ -77,8 +77,6 @@ def workbegin_handler():
     # m5.debug.flags["ExecAll"].enable()
     m5.debug.flags["Cache"].enable()
     m5.debug.flags["PseudoInst"].enable()
-
-    # Enable our custom AMX debug flag to see the DPRINTF output
     m5.debug.flags["AMX"].enable()
 
     yield False  # Yielding False tells the simulator to continue running
