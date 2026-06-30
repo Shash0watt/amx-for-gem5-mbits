@@ -12,4 +12,3 @@ class AmxAccl(ClockedObject):
     # memory side port to ask for cache reads
     mem_side_port = RequestPort(
         "Memory side port to send timing read requests")
-  

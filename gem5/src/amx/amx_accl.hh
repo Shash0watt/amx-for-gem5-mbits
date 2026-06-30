@@ -15,6 +15,19 @@ namespace gem5
 
 class AmxAccl : public ClockedObject
 {
+
+  public:
+    // used for async port req tracking with packets
+    // we use this to identify exactly which tile and row the payload belongs to
+    struct AmxSenderState : public Packet::SenderState
+    {
+        uint8_t destTile;
+        uint8_t rowIdx;
+        AmxSenderState(uint8_t dest, uint8_t row) : 
+            destTile(dest), rowIdx(row) {}
+    };
+
+
   private:
     class AmxMemPort : public RequestPort
     {
@@ -53,6 +66,8 @@ class AmxAccl : public ClockedObject
     };
     // Renamed member variable to amxMemPort
     AmxMemPort amxMemPort;
+
+    
 
   public:
     AmxAccl(const AmxAcclParams &p);

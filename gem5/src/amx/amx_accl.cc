@@ -17,6 +17,25 @@ AmxAccl::AmxAccl(const AmxAcclParams &amp;params) :
     std::memset(&currentCfg, 0, sizeof(TileCfg));
     std::memset(tiles, 0, sizeof(tiles));
 
+    // struct TileCfg {
+    //         uint8_t palette_id;
+    //         uint8_t start_row;
+    //         uint8_t reserved_0[14];
+    //         uint16_t colsb[16];
+    //         uint8_t rows[16];
+    //     };
+
+    // for debugging and so that we don't need the tile config instruction right now
+    currentCfg.palette_id = 1; // this means that the AMX accelerator will be on..
+    // TODO implement palette_id check
+    currentCfg.start_row = 0; // TODO implement start_row behaviour
+
+    for (int i = 0; i < NUM_TILES; i++) {
+        currentCfg.rows[i] = MAX_ROWS;         
+        currentCfg.colsb[i] = MAX_COLS_BYTES;   
+    }
+    
+
     DPRINTF(AMX, "Created the AMX object\n");
 }
 
@@ -34,17 +53,17 @@ AmxAccl::getPort(const std::string &amp;if_name, PortID idx)
 void
 AmxAccl::AmxMemPort::recvReqRetry()
 {
-    DPRINTF(AMX, "Port callback: Cache requested a retry!\n");
+    DPRINTF(AMX, "Port callback: Cache requested a retry\n");
 }
 
 // data return from the cache (async)
 bool
 AmxAccl::AmxMemPort::recvTimingResp(PacketPtr pkt)
 {
-    DPRINTF(AMX, "Port callback: A timing response packet has arrived from the cache!\n");
+    DPRINTF(AMX, "Port callback: A timing response packet has arrived from the cache\n");
 
     if (pkt->isError()) {
-        DPRINTF(AMX, "Packet returned with an ERROR status! Destination Address was unmapped or faulty.\n");
+        DPRINTF(AMX, "Packet returned with an ERROR status, Destination Address was unmapped or faulty.\n");
         
         delete pkt;
         return true; 
@@ -84,10 +103,10 @@ AmxAccl::startup()
 void
 AmxAccl::startAmxLoad(ThreadContext *tc, uint64_t dest_tile, uint64_t src_mem, size_t stride)
 {
-    DPRINTF(AMX, "Received amxLoadd! Dest: %llu, Src: %llu, Stride: %lu\n", 
+    DPRINTF(AMX, "Received amxLoadd.. Dest: %llu, Src: %llu, Stride: %lu\n", 
             dest_tile, src_mem, stride);
 
-    int cache_line_size = 64;     
+    int cache_line_size =   64;     
     uint64_t aligned_src_mem = src_mem &amp; ~(cache_line_size - 1);
 
     RequestPtr req = std::make_shared<Request>(
@@ -99,12 +118,25 @@ AmxAccl::startAmxLoad(ThreadContext *tc, uint64_t dest_tile, uint64_t src_mem, s
         tc->contextId()                    // The thread ID
     );
 
-    // perform a functional page-table walk translation 
+    // TODO: perform a timing page-walk/address translation 
     Fault fault = tc->getMMUPtr()->translateFunctional(req, tc, BaseMMU::Read);
     if (fault != NoFault) {
         DPRINTF(AMX, "Translation failed for virtual address 0x%lx\n", src_mem);
         return; 
     }
+
+    // do a strided load
+    uint8_t num_rows = currentCfg.num_rows[dest_tile];
+    uint8_t bytes_per_row = currentCfg.bytes_per_row[dest_tile];
+
+    for (int i = 0; i < num_rows; i++){
+        // calculate the vaddr for each row
+        // make the packet
+        // send the request
+        // what is sender state??
+    }
+    
+
 
     // make a Read Packet
     PacketPtr pkt = new Packet(req, MemCmd::ReadReq);
@@ -116,8 +148,8 @@ AmxAccl::startAmxLoad(ThreadContext *tc, uint64_t dest_tile, uint64_t src_mem, s
         DPRINTF(AMX, "Timing read request successfully sent for physical address 0x%lx\n", 
                 req->getPaddr());
     } else {
-        DPRINTF(AMX, "Cache rejected the timing request (busy). Retries are not handled yet!\n");
-        // TODO implement retrying if there is a cache miss!!!
+        DPRINTF(AMX, "Cache rejected the timing request (busy). Retries are not handled yet\n");
+        // TODO: implement retrying if there is a cache miss!!!
         delete pkt;
     }
 }
