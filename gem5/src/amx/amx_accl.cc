@@ -10,9 +10,9 @@
 namespace gem5
 {
 
-AmxAccl::AmxAccl(const AmxAcclParams &amp;params) :
-    ClockedObject(params), 
-    amxMemPort(params.name + ".mem_side_port", this) // port constructor call
+AmxAccl::AmxAccl(const AmxAcclParams &params) :
+    ClockedObject(params),
+    cpu(nullptr) // Pointer to the parent CPU, initialized as null and set via setCPU() by the CPU itself
 {
     std::memset(&currentCfg, 0, sizeof(TileCfg));
     std::memset(tiles, 0, sizeof(tiles));
@@ -34,46 +34,32 @@ AmxAccl::AmxAccl(const AmxAcclParams &amp;params) :
         currentCfg.rows[i] = MAX_ROWS;         
         currentCfg.colsb[i] = MAX_COLS_BYTES;   
     }
-    
 
     DPRINTF(AMX, "Created the AMX object\n");
 }
 
-// connect Python ports to C++ ports
-Port &amp;
-AmxAccl::getPort(const std::string &amp;if_name, PortID idx)
-{
-    if (if_name == "mem_side_port") {
-        return amxMemPort; // return our port object
-    }
-    return ClockedObject::getPort(if_name, idx);
-}
-
-// wake up notification from the cache
 void
-AmxAccl::AmxMemPort::recvReqRetry()
+AmxAccl::setCPU(BaseCPU *_cpu)
 {
-    DPRINTF(AMX, "Port callback: Cache requested a retry\n");
+    cpu = _cpu;
+    DPRINTF(AMX, "AMX: Parent CPU is set to %s\n", cpu->name());
 }
 
-// data return from the cache (async)
-bool
-AmxAccl::AmxMemPort::recvTimingResp(PacketPtr pkt)
+void
+AmxAccl::handleMemResponse(PacketPtr pkt)
 {
-    DPRINTF(AMX, "Port callback: A timing response packet has arrived from the cache\n");
+    DPRINTF(AMX, "AMX: handleMemResponse called for packet at paddr 0x%lx\n", pkt->getAddr());
 
     if (pkt->isError()) {
         DPRINTF(AMX, "Packet returned with an ERROR status, Destination Address was unmapped or faulty.\n");
-        
         delete pkt;
-        return true; 
+        return; 
     }
 
     if (!pkt->hasData()) {
         DPRINTF(AMX, "Packet arrived safely, but contains NO data payload to print.\n");
-        
         delete pkt;
-        return true;
+        return;
     }
 
     // Interpret the packet data buffer as signed 8-bit integers
@@ -82,16 +68,13 @@ AmxAccl::AmxMemPort::recvTimingResp(PacketPtr pkt)
     std::string int8_output = "";
     for (int i = 0; i < pkt->getSize(); i++) {
         char buf[8];
-        // %d will print the signed values (ranging from -128 to 127)
         snprintf(buf, sizeof(buf), "%d ", data_ptr[i]);
         int8_output += buf;
     }
     
-    DPRINTF(AMX, "Data loaded into cache line (as int8): [ %s]\n", int8_output.c_str());
+    DPRINTF(AMX, "Data loaded into matrix (as int8): [ %s]\n", int8_output.c_str());
 
     delete pkt;
-
-    return true; 
 }
 
 void
@@ -106,9 +89,20 @@ AmxAccl::startAmxLoad(ThreadContext *tc, uint64_t dest_tile, uint64_t src_mem, s
     DPRINTF(AMX, "Received amxLoadd.. Dest: %llu, Src: %llu, Stride: %lu\n", 
             dest_tile, src_mem, stride);
 
-    int cache_line_size =   64;     
-    uint64_t aligned_src_mem = src_mem &amp; ~(cache_line_size - 1);
+    // Internal core multiplexing debug log
+    if (cpu) {
+        RequestPort &dcache_port = dynamic_cast<RequestPort &>(cpu->getDataPort());
+        DPRINTF(AMX, "AMX: Accessing CPU's dcache port: %s\n", dcache_port.name());
+    } else {
+        DPRINTF(AMX, "AMX: Warning: CPU pointer is null in startAmxLoad!\n");
+    }
 
+    // 1. Align the virtual address to a standard 64-byte cache line
+    int cache_line_size = 64;     
+    uint64_t aligned_src_mem = src_mem & ~(cache_line_size - 1);
+
+    // 2. Construct a baseline master Request object
+    // We grab the RequestorID, instruction pointer, and context ID directly from the CPU thread.
     RequestPtr req = std::make_shared<Request>(
         aligned_src_mem,
         cache_line_size,
@@ -126,30 +120,33 @@ AmxAccl::startAmxLoad(ThreadContext *tc, uint64_t dest_tile, uint64_t src_mem, s
     }
 
     // do a strided load
-    uint8_t num_rows = currentCfg.num_rows[dest_tile];
-    uint8_t bytes_per_row = currentCfg.bytes_per_row[dest_tile];
+    // uint8_t num_rows = currentCfg.num_rows[dest_tile];
+    // uint8_t bytes_per_row = currentCfg.bytes_per_row[dest_tile];
 
-    for (int i = 0; i < num_rows; i++){
-        // calculate the vaddr for each row
-        // make the packet
-        // send the request
-        // what is sender state??
-    }
-    
-
+    // for (int i = 0; i < num_rows; i++){
+    //     // calculate the vaddr for each row
+    //     // make the packet
+    //     // send the request
+    //     // what is sender state??
+    // }
 
     // make a Read Packet
     PacketPtr pkt = new Packet(req, MemCmd::ReadReq);
     pkt->allocate(); // used to initialize a data buffer within the packet
 
-    // send the timing request through our structural memory port
-    // sendTimingReq returns true if the cache accepts it, or false if it is blocked/busy.
-    if (amxMemPort.sendTimingReq(pkt)) { // Renamed variable reference
-        DPRINTF(AMX, "Timing read request successfully sent for physical address 0x%lx\n", 
-                req->getPaddr());
+    // For the barebones phase, print debug messages and try to send the request via CPU's dcache port.
+    // Instead of our deprecated amxMemPort, we now push requests directly onto the parent CPU's dcache_port.
+    if (cpu) {
+        RequestPort &dcache_port = dynamic_cast<RequestPort &>(cpu->getDataPort());
+        if (dcache_port.sendTimingReq(pkt)) {
+            DPRINTF(AMX, "Timing read request successfully sent via CPU dcache port for physical address 0x%lx\n", 
+                    req->getPaddr());
+        } else {
+            DPRINTF(AMX, "CPU dcache port rejected the timing request (busy). Retries are not handled yet\n");
+            delete pkt;
+        }
     } else {
-        DPRINTF(AMX, "Cache rejected the timing request (busy). Retries are not handled yet\n");
-        // TODO: implement retrying if there is a cache miss!!!
+        DPRINTF(AMX, "AMX: CPU pointer not set, dropping packet\n");
         delete pkt;
     }
 }

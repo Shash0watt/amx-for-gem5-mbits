@@ -40,6 +40,7 @@
  */
 
 #include "cpu/simple/timing.hh"
+#include "amx/amx_accl.hh"
 
 #include "arch/generic/decoder.hh"
 #include "base/compiler.hh"
@@ -1141,6 +1142,21 @@ bool
 TimingSimpleCPU::DcachePort::recvTimingResp(PacketPtr pkt)
 {
     DPRINTF(SimpleCPU, "Received load/store response %#x\n", pkt->getAddr());
+
+    // Check if the response is for the AMX accelerator. In internal core multiplexing,
+    // response packets return through the CPU's primary data port and must be intercepted
+    // and routed back to the accelerator if they contain the AmxSenderState token.
+    if (pkt->senderState) {
+        auto amx_state = dynamic_cast<AmxAccl::AmxSenderState *>(pkt->senderState);
+        if (amx_state) {
+            if (cpu->getAmxAccl()) {
+                cpu->getAmxAccl()->handleMemResponse(pkt);
+            } else {
+                delete pkt;
+            }
+            return true;
+        }
+    }
 
     // The timing CPU is not really ticked, instead it relies on the
     // memory system (fetch and load/store) to set the pace.

@@ -72,6 +72,7 @@
 
 // Hack
 #include "sim/stat_control.hh"
+#include "amx/amx_accl.hh"
 
 namespace gem5
 {
@@ -227,6 +228,12 @@ BaseCPU::BaseCPU(const Params &p, bool is_checker)
         commitStatptr->ratioUserOps = commitStatptr->numUserOps /
             commitStatptr->numOps;
         commitStats.emplace_back(commitStatptr);
+    }
+
+    // In internal core multiplexing, the AMX accelerator needs to know its parent
+    // CPU in order to directly access the CPU's memory ports.
+    if (amxAccl != nullptr) {
+        amxAccl->setCPU(this);
     }
 }
 

@@ -8,7 +8,3 @@ class AmxAccl(ClockedObject):
     type = "AmxAccl"
     cxx_header = "amx/amx_accl.hh"
     cxx_class = "gem5::AmxAccl"
-
-    # memory side port to ask for cache reads
-    mem_side_port = RequestPort(
-        "Memory side port to send timing read requests")
