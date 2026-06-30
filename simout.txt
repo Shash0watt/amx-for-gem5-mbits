@@ -2,15 +2,12 @@ gem5 Simulator System.  https://www.gem5.org
 gem5 is copyrighted software; use the --copyright option for details.
 
 gem5 version 25.1.0.1
-gem5 compiled May 28 2026 21:57:39
-gem5 started May 31 2026 14:14:48
-gem5 executing on mbit10, pid 824421
-command line: ./gem5.debug -rs avx/test_bench.py
+gem5 compiled Jun 30 2026 13:02:48
+gem5 started Jun 30 2026 13:22:24
+gem5 executing on mbit10, pid 3569622
+command line: ./gem5/build/X86/gem5.opt -rs amx-workloads/tb.py
 
-warn: Base 10 memory/cache size 1GB will be cast to base 2 size 1GiB.
-Starting SE Simulation for: test
-warn: Base 10 memory/cache size 64kB will be cast to base 2 size 64KiB.
-warn: Base 10 memory/cache size 64kB will be cast to base 2 size 64KiB.
+Starting SE Simulation for: load_test
 Global frequency set at 1000000000000 ticks per second
 warn: No dot file generated. Please install pydot to generate the dot file and pdf.
 src/mem/dram_interface.cc:690: warn: DRAM device capacity (16384 Mbytes) does not match the address range assigned (1024 Mbytes)
@@ -23,49 +20,66 @@ src/sim/syscall_emul.cc:86: warn: ignoring syscall mprotect(...)
 src/sim/syscall_emul.cc:86: warn: ignoring syscall mprotect(...)
 src/sim/syscall_emul.cc:86: warn: ignoring syscall mprotect(...)
 
---- Start of AVX instruction ---
+--- Start of AMX isnstruction ---
 
-260240000: board.processor.cores.core: T0 : 0x11e4 @m5_work_begin+4    : ret	                      
-260240000: board.processor.cores.core: T0 : 0x11e4 @m5_work_begin+4. 0 :   RET_NEAR : ld   t1, SS:[t0 + rsp] : MemRead :  D=0x0000000000001144 A=0x7fffffffed08
-260241000: board.processor.cores.core: T0 : 0x11e4 @m5_work_begin+4. 1 :   RET_NEAR : addi   rsp, rsp, 0x8 : IntAlu :  D=0x00007fffffffed10
-260241000: board.processor.cores.core: T0 : 0x11e4 @m5_work_begin+4. 2 :   RET_NEAR : wripi   t1, 0 : IntAlu : 
-260243000: board.processor.cores.core: T0 : 0x1144 @main+27    : mov	SS:[rbp + 0xfffffffffffffff8], 0x800
-260243000: board.processor.cores.core: T0 : 0x1144 @main+27. 0 :   MOV_M_I : limm   t1, 0x800 : IntAlu :  D=0x0000000000000800
-260243000: board.processor.cores.core: T0 : 0x1144 @main+27. 1 :   MOV_M_I : st   t1, SS:[rbp + 0xfffffffffffffff8] : MemWrite :  D=0x0000000000000800 A=0x7fffffffed18
-260245000: board.processor.cores.core: T0 : 0x114c @main+35    : mov	rax, SS:[rbp + 0xfffffffffffffff8]
-260245000: board.processor.cores.core: T0 : 0x114c @main+35. 0 :   MOV_R_M : ld   rax, SS:[rbp + 0xfffffffffffffff8] : MemRead :  D=0x0000000000000800 A=0x7fffffffed18
-260247000: board.processor.cores.core: T0 : 0x1150 @main+39    : mov	rax                   
-260247000: board.processor.cores.core: T0 : 0x1150 @main+39. 0 :   MOV_R_R : mov   rdi, rdi, rax : IntAlu :  D=0x0000000000000800
-260248000: board.processor.cores.core: T0 : 0x1153 @main+42    : call	0xa1                 
-260248000: board.processor.cores.core: T0 : 0x1153 @main+42. 0 :   CALL_NEAR_I : limm   t1, 0xa1 : IntAlu :  D=0x00000000000000a1
-260248000: board.processor.cores.core: T0 : 0x1153 @main+42. 1 :   CALL_NEAR_I : rdip   t7, t7 : IntAlu :  D=0x0000000000001158
-260248000: board.processor.cores.core: T0 : 0x1153 @main+42. 2 :   CALL_NEAR_I : st   t7, SS:[rsp + 0xfffffffffffffff8] : MemWrite :  D=0x0000000000001158 A=0x7fffffffed08
-260249000: board.processor.cores.core: T0 : 0x1153 @main+42. 3 :   CALL_NEAR_I : subi   rsp, rsp, 0x8 : IntAlu :  D=0x00007fffffffed08
-260249000: board.processor.cores.core: T0 : 0x1153 @main+42. 4 :   CALL_NEAR_I : wrip   t7, t1 : IntAlu : 
-260250000: global: pseudo_inst::pseudoInst(99)
-260250000: global: Tried to load 2048 into YMM reg
-260250000: board.processor.cores.core: T0 : 0x11f9 @m5_avx_load    :   gem5Op                   : IntAlu :  D=0x0000000000000000
-260251000: board.processor.cores.core: T0 : 0x11fd @m5_avx_load+4    : ret	                      
-260251000: board.processor.cores.core: T0 : 0x11fd @m5_avx_load+4. 0 :   RET_NEAR : ld   t1, SS:[t0 + rsp] : MemRead :  D=0x0000000000001158 A=0x7fffffffed08
-260252000: board.processor.cores.core: T0 : 0x11fd @m5_avx_load+4. 1 :   RET_NEAR : addi   rsp, rsp, 0x8 : IntAlu :  D=0x00007fffffffed10
-260252000: board.processor.cores.core: T0 : 0x11fd @m5_avx_load+4. 2 :   RET_NEAR : wripi   t1, 0 : IntAlu : 
-260253000: board.processor.cores.core: T0 : 0x1158 @main+47    : addpd	XMM0                
-260253000: board.processor.cores.core: T0 : 0x1158 @main+47. 0 :   ADDPD_XMM_XMM : maddf   %xmm0_low, %xmm0_low, %xmm2_low : SimdFloatAdd :  D=0x65672f6972756761
-260253000: board.processor.cores.core: T0 : 0x1158 @main+47. 1 :   ADDPD_XMM_XMM : maddf   %xmm0_high, %xmm0_high, %xmm2_high : SimdFloatAdd :  D=0x612f786d612d356d
-260255000: board.processor.cores.core: T0 : 0x115c @main+51    : mov	esi, 0                
-260255000: board.processor.cores.core: T0 : 0x115c @main+51. 0 :   MOV_R_I : limm   esi, 0  : IntAlu :  D=0x0000000000000000
-260256000: board.processor.cores.core: T0 : 0x1161 @main+56    : mov	edi, 0                
-260256000: board.processor.cores.core: T0 : 0x1161 @main+56. 0 :   MOV_R_I : limm   edi, 0  : IntAlu :  D=0x0000000000000000
-260258000: board.processor.cores.core: T0 : 0x1166 @main+61    : call	0x7a                 
-260258000: board.processor.cores.core: T0 : 0x1166 @main+61. 0 :   CALL_NEAR_I : limm   t1, 0x7a : IntAlu :  D=0x000000000000007a
-260258000: board.processor.cores.core: T0 : 0x1166 @main+61. 1 :   CALL_NEAR_I : rdip   t7, t7 : IntAlu :  D=0x000000000000116b
-260258000: board.processor.cores.core: T0 : 0x1166 @main+61. 2 :   CALL_NEAR_I : st   t7, SS:[rsp + 0xfffffffffffffff8] : MemWrite :  D=0x000000000000116b A=0x7fffffffed08
-260259000: board.processor.cores.core: T0 : 0x1166 @main+61. 3 :   CALL_NEAR_I : subi   rsp, rsp, 0x8 : IntAlu :  D=0x00007fffffffed08
-260259000: board.processor.cores.core: T0 : 0x1166 @main+61. 4 :   CALL_NEAR_I : wrip   t7, t1 : IntAlu : 
-260261000: global: pseudo_inst::pseudoInst(91)
-260261000: global: pseudo_inst::workend(0, 0)
-260261000: board.processor.cores.core: T0 : 0x11e5 @m5_work_end    :   gem5Op                   : IntAlu :  D=0x0000000000000000
+261925000: board.cache_hierarchy.l1dcaches: access for ReadReq [3fce8:3fcef] hit state: e (M) writable: 1 readable: 1 dirty: 1 prefetched: 0 | tag: 0x1f secure: 0 valid: 1 | set: 0x73 way: 0x3
+261926000: board.cache_hierarchy.l1icaches: access for ReadReq [11a0:11a7] IF hit state: 6 (E) writable: 1 readable: 1 dirty: 0 prefetched: 0 | tag: 0 secure: 0 valid: 1 | set: 0x46 way: 0x7
+261927000: board.cache_hierarchy.l1icaches: access for ReadReq [11a8:11af] IF hit state: 6 (E) writable: 1 readable: 1 dirty: 0 prefetched: 0 | tag: 0 secure: 0 valid: 1 | set: 0x46 way: 0x7
+261928000: board.cache_hierarchy.l1dcaches: access for ReadReq [3fd08:3fd0f] hit state: e (M) writable: 1 readable: 1 dirty: 1 prefetched: 0 | tag: 0x1f secure: 0 valid: 1 | set: 0x74 way: 0x5
+261929000: board.cache_hierarchy.l1icaches: access for ReadReq [11a8:11af] IF hit state: 6 (E) writable: 1 readable: 1 dirty: 0 prefetched: 0 | tag: 0 secure: 0 valid: 1 | set: 0x46 way: 0x7
+261930000: board.cache_hierarchy.l1dcaches: access for ReadReq [3fd00:3fd07] hit state: e (M) writable: 1 readable: 1 dirty: 1 prefetched: 0 | tag: 0x1f secure: 0 valid: 1 | set: 0x74 way: 0x5
+261931000: board.cache_hierarchy.l1icaches: access for ReadReq [11a8:11af] IF hit state: 6 (E) writable: 1 readable: 1 dirty: 0 prefetched: 0 | tag: 0 secure: 0 valid: 1 | set: 0x46 way: 0x7
+261932000: board.cache_hierarchy.l1icaches: access for ReadReq [11b0:11b7] IF hit state: 6 (E) writable: 1 readable: 1 dirty: 0 prefetched: 0 | tag: 0 secure: 0 valid: 1 | set: 0x46 way: 0x7
+261933000: board.cache_hierarchy.l1dcaches: access for ReadReq [3fcf0:3fcf7] hit state: e (M) writable: 1 readable: 1 dirty: 1 prefetched: 0 | tag: 0x1f secure: 0 valid: 1 | set: 0x73 way: 0x3
+261934000: board.cache_hierarchy.l1icaches: access for ReadReq [11b0:11b7] IF hit state: 6 (E) writable: 1 readable: 1 dirty: 0 prefetched: 0 | tag: 0 secure: 0 valid: 1 | set: 0x46 way: 0x7
+261935000: board.cache_hierarchy.l1icaches: access for ReadReq [11b0:11b7] IF hit state: 6 (E) writable: 1 readable: 1 dirty: 0 prefetched: 0 | tag: 0 secure: 0 valid: 1 | set: 0x46 way: 0x7
+261936000: board.cache_hierarchy.l1icaches: access for ReadReq [11b8:11bf] IF hit state: 6 (E) writable: 1 readable: 1 dirty: 0 prefetched: 0 | tag: 0 secure: 0 valid: 1 | set: 0x46 way: 0x7
+261937000: board.cache_hierarchy.l1dcaches: access for WriteReq [3fce8:3fcef] hit state: e (M) writable: 1 readable: 1 dirty: 1 prefetched: 0 | tag: 0x1f secure: 0 valid: 1 | set: 0x73 way: 0x3
+261938000: board.cache_hierarchy.l1icaches: access for ReadReq [1268:126f] IF hit state: 6 (E) writable: 1 readable: 1 dirty: 0 prefetched: 0 | tag: 0 secure: 0 valid: 1 | set: 0x49 way: 0x7
+261939000: board.cache_hierarchy.l1icaches: access for ReadReq [1270:1277] IF hit state: 6 (E) writable: 1 readable: 1 dirty: 0 prefetched: 0 | tag: 0 secure: 0 valid: 1 | set: 0x49 way: 0x7
+261940000: global: pseudo_inst::pseudoInst(99)
+261940000: board.processor.cores.core.amx_accl: Received amxLoadd.. Dest: 0, Src: 140737488350480, Stride: 64
+261940000: board.processor.cores.core.amx_accl: Accessing CPU's dcache port: board.processor.cores.core.dcache_port
+261940000: board.cache_hierarchy.l1dcaches: access for ReadReq [3fd00:3fd3f] hit state: e (M) writable: 1 readable: 1 dirty: 1 prefetched: 0 | tag: 0x1f secure: 0 valid: 1 | set: 0x74 way: 0x5
+261940000: board.processor.cores.core.amx_accl: Timing read request successfully sent via CPU dcache port for physical address 0x3fd00
+261940000: board.cache_hierarchy.l1icaches: access for ReadReq [1270:1277] IF hit state: 6 (E) writable: 1 readable: 1 dirty: 0 prefetched: 0 | tag: 0 secure: 0 valid: 1 | set: 0x49 way: 0x7
+261941000: board.cache_hierarchy.l1dcaches: access for ReadReq [3fce8:3fcef] hit state: e (M) writable: 1 readable: 1 dirty: 1 prefetched: 0 | tag: 0x1f secure: 0 valid: 1 | set: 0x73 way: 0x3
+261941000: board.cache_hierarchy.l1icaches: access for ReadReq [3fd10:3fd17] IF miss
+261942000: board.cache_hierarchy.l1icaches: sendMSHRQueuePacket: MSHR ReadReq [3fd10:3fd17] IF
+261942000: board.cache_hierarchy.l1icaches: createMissPacket: created ReadSharedReq [3fd00:3fd3f] IF from ReadReq [3fd10:3fd17] IF
+261942000: board.cache_hierarchy.l1dcaches: handleSnoop: snoop hit for ReadSharedReq [3fd00:3fd3f] IF, old state is state: e (M) writable: 1 readable: 1 dirty: 1 prefetched: 0 | tag: 0x1f secure: 0 valid: 1 | set: 0x74 way: 0x5
+261942000: board.cache_hierarchy.l1dcaches: new state is state: c (O) writable: 0 readable: 1 dirty: 1 prefetched: 0 | tag: 0x1f secure: 0 valid: 1 | set: 0x74 way: 0x5
+261942000: board.cache_hierarchy.l1dcaches: doTimingSupplyResponse: for ReadSharedReq [3fd00:3fd3f] IF
+gem5.opt: src/cpu/simple/timing.cc:963: void gem5::TimingSimpleCPU::completeDataAccess(gem5::PacketPtr): Assertion `_status == DcacheWaitResponse || _status == DTBWaitResponse || pkt->req->getFlags().isSet(Request::NO_ACCESS)' failed.
+Program aborted at tick 261942000
+--- BEGIN LIBC BACKTRACE ---
+./gem5/build/X86/gem5.opt(_ZN4gem515print_backtraceEv+0x30)[0x612024d5e930]
+./gem5/build/X86/gem5.opt(_ZN4gem512abortHandlerEi+0x4c)[0x612024d87e2c]
+/lib/x86_64-linux-gnu/libc.so.6(+0x45330)[0x7beff3445330]
+/lib/x86_64-linux-gnu/libc.so.6(pthread_kill+0x11c)[0x7beff349eb2c]
+/lib/x86_64-linux-gnu/libc.so.6(gsignal+0x1e)[0x7beff344527e]
+/lib/x86_64-linux-gnu/libc.so.6(abort+0xdf)[0x7beff34288ff]
+/lib/x86_64-linux-gnu/libc.so.6(+0x2881b)[0x7beff342881b]
+/lib/x86_64-linux-gnu/libc.so.6(+0x3b517)[0x7beff343b517]
+./gem5/build/X86/gem5.opt(_ZN4gem515TimingSimpleCPU18completeDataAccessEPNS_6PacketE+0x1b3)[0x612024a41cf3]
+./gem5/build/X86/gem5.opt(_ZN4gem510EventQueue10serviceOneEv+0x155)[0x612024d75e85]
+./gem5/build/X86/gem5.opt(_ZN4gem59doSimLoopEPNS_10EventQueueE+0x70)[0x612024da8290]
+./gem5/build/X86/gem5.opt(_ZN4gem58simulateEm+0x25e)[0x612024da8a2e]
+./gem5/build/X86/gem5.opt(+0x109dbc2)[0x6120245f2bc2]
+./gem5/build/X86/gem5.opt(+0xb6474a)[0x6120240b974a]
+/lib/x86_64-linux-gnu/libpython3.12.so.1.0(+0x1df4b8)[0x7beff47df4b8]
+/lib/x86_64-linux-gnu/libpython3.12.so.1.0(_PyObject_Call+0x5c)[0x7beff478485c]
+/lib/x86_64-linux-gnu/libpython3.12.so.1.0(_PyEval_EvalFrameDefault+0x8ec)[0x7beff4719dec]
+/lib/x86_64-linux-gnu/libpython3.12.so.1.0(PyEval_EvalCode+0x20f)[0x7beff48a091f]
+/lib/x86_64-linux-gnu/libpython3.12.so.1.0(+0x29c8b0)[0x7beff489c8b0]
+/lib/x86_64-linux-gnu/libpython3.12.so.1.0(+0x1dfadc)[0x7beff47dfadc]
+/lib/x86_64-linux-gnu/libpython3.12.so.1.0(PyObject_Vectorcall+0x5c)[0x7beff4782b2c]
+/lib/x86_64-linux-gnu/libpython3.12.so.1.0(_PyEval_EvalFrameDefault+0x40ee)[0x7beff471d5ee]
+./gem5/build/X86/gem5.opt(+0x107e339)[0x6120245d3339]
+./gem5/build/X86/gem5.opt(main+0x218)[0x6120240753b8]
+/lib/x86_64-linux-gnu/libc.so.6(+0x2a1ca)[0x7beff342a1ca]
+/lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0x8b)[0x7beff342a28b]
+./gem5/build/X86/gem5.opt(_start+0x25)[0x6120240a59f5]
+--- END LIBC BACKTRACE ---
+For more info on how to address this issue, please visit https://www.gem5.org/documentation/general_docs/common-errors/ 
 
---- End of AVX instruction ---
-
-Simulation Done

@@ -48,19 +48,29 @@ AmxAccl::setCPU(BaseCPU *_cpu)
 void
 AmxAccl::handleMemResponse(PacketPtr pkt)
 {
-    DPRINTF(AMX, "handleMemResponse called for packet at paddr 0x%lx\n", pkt->getAddr());
+    DPRINTF(AMX, "AMX: handleMemResponse called for packet at paddr 0x%lx\n", pkt->getAddr());
 
     if (pkt->isError()) {
         DPRINTF(AMX, "Packet returned with an ERROR status, Destination Address was unmapped or faulty.\n");
+        if (pkt->senderState) {
+            delete pkt->popSenderState();
+        }
         delete pkt;
         return; 
     }
 
     if (!pkt->hasData()) {
         DPRINTF(AMX, "Packet arrived safely, but contains NO data payload to print.\n");
+        if (pkt->senderState) {
+            delete pkt->popSenderState();
+        }
         delete pkt;
         return;
     }
+
+    // Pop our custom tracking token off the packet state stack
+    AmxSenderState *state = dynamic_cast<AmxSenderState*>(pkt->popSenderState());
+    panic_if(!state, "AMX response packet arrived missing its tracking SenderState token!");
 
     // Interpret the packet data buffer as signed 8-bit integers
     int8_t *data_ptr = reinterpret_cast<int8_t*>(pkt->getPtr<uint8_t>());
@@ -74,6 +84,7 @@ AmxAccl::handleMemResponse(PacketPtr pkt)
     
     DPRINTF(AMX, "Data loaded into matrix (as int8): [ %s]\n", int8_output.c_str());
 
+    delete state;
     delete pkt;
 }
 
@@ -97,12 +108,12 @@ AmxAccl::startAmxLoad(ThreadContext *tc, uint64_t dest_tile, uint64_t src_mem, s
         DPRINTF(AMX, "Warning, CPU pointer is null in startAmxLoad!\n");
     }
 
-    // 1. Align the virtual address to a standard 64-byte cache line
+    // align the virtual address to a standard 64-byte cache line
     int cache_line_size = 64;     
     uint64_t aligned_src_mem = src_mem & ~(cache_line_size - 1);
 
-    // 2. Construct a baseline master Request object
-    // We grab the RequestorID, instruction pointer, and context ID directly from the CPU thread.
+    // make a baseline master Request object
+    // get the RequestorID, instruction pointer, and context ID directly from the CPU thread.
     RequestPtr req = std::make_shared<Request>(
         aligned_src_mem,
         cache_line_size,
@@ -119,20 +130,10 @@ AmxAccl::startAmxLoad(ThreadContext *tc, uint64_t dest_tile, uint64_t src_mem, s
         return; 
     }
 
-    // do a strided load
-    // uint8_t num_rows = currentCfg.num_rows[dest_tile];
-    // uint8_t bytes_per_row = currentCfg.bytes_per_row[dest_tile];
-
-    // for (int i = 0; i < num_rows; i++){
-    //     // calculate the vaddr for each row
-    //     // make the packet
-    //     // send the request
-    //     // what is sender state??
-    // }
-
     // make a Read Packet
     PacketPtr pkt = new Packet(req, MemCmd::ReadReq);
     pkt->allocate(); // used to initialize a data buffer within the packet
+    pkt->pushSenderState(new AmxSenderState(dest_tile, 0));
 
     // For the barebones phase, print debug messages and try to send the request via CPU's dcache port.
     // Instead of our deprecated amxMemPort, we now push requests directly onto the parent CPU's dcache_port.
@@ -143,10 +144,16 @@ AmxAccl::startAmxLoad(ThreadContext *tc, uint64_t dest_tile, uint64_t src_mem, s
                     req->getPaddr());
         } else {
             DPRINTF(AMX, "CPU dcache port rejected the timing request (busy). Retries are not handled yet\n");
+            if (pkt->senderState) {
+                delete pkt->popSenderState();
+            }
             delete pkt;
         }
     } else {
         DPRINTF(AMX, "CPU pointer not set, dropping packet\n");
+        if (pkt->senderState) {
+            delete pkt->popSenderState();
+        }
         delete pkt;
     }
 }
