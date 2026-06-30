@@ -58,6 +58,9 @@
 #include "sim/full_system.hh"
 #include "sim/system.hh"
 
+#include "debug/AMX.hh" // flags for gem5 acclelerator
+
+
 namespace gem5
 {
 
