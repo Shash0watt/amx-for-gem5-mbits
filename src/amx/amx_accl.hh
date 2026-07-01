@@ -5,9 +5,9 @@
 #include "cpu/thread_context.hh"
 
 // #include "sim/sim_object.hh" // swap out since we are using a clocked object
-#include "sim/clocked_object.hh" 
+#include "sim/clocked_object.hh"
 
-#include "mem/port.hh"    // Required for RequestPort definition
+// #include "mem/port.hh"    // Required for RequestPort definition
 #include "mem/packet.hh"  // Required for PacketPtr usage
 
 namespace gem5
@@ -25,7 +25,7 @@ class AmxAccl : public ClockedObject
     {
         uint8_t destTile;
         uint8_t rowIdx;
-        AmxSenderState(uint8_t dest, uint8_t row) : 
+        AmxSenderState(uint8_t dest, uint8_t row) :
             destTile(dest), rowIdx(row) {}
     };
 
@@ -59,13 +59,13 @@ class AmxAccl : public ClockedObject
   public:
     AmxAccl(const AmxAcclParams &p);
     void startup() override;
-    
+
     // Sets the parent CPU reference for accessing its memory ports.
     void setCPU(BaseCPU *_cpu);
     BaseCPU* getCPU() const { return cpu; }
-    
-    void startAmxLoad(ThreadContext *tc, uint64_t dest_tile, uint64_t src_mem, size_t stride);
-    
+
+    void startAmxLoad(ThreadContext *tc, uint64_t dest_tile, uint64_t src_mem, uint64_t stride);
+
     // Handles memory responses routed from the CPU. Replaces AmxMemPort::recvTimingResp.
     void handleMemResponse(PacketPtr pkt);
 };

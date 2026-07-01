@@ -1,30 +1,36 @@
 # System components
+# Standard libraries
+from pathlib import Path
+
+import m5.debug
+
+# Import your newly compiled SimObject and the CoherentXBar interconnect
+from m5.objects import (
+    AmxAccl,
+    CoherentXBar,
+)
+
 from gem5.components.boards.simple_board import SimpleBoard
-from gem5.components.processors.simple_processor import SimpleProcessor
+from gem5.components.cachehierarchies.classic.private_l1_cache_hierarchy import (
+    PrivateL1CacheHierarchy,
+)
 from gem5.components.memory.single_channel import SingleChannelDDR4_2400
-from gem5.components.cachehierarchies.classic.private_l1_cache_hierarchy import PrivateL1CacheHierarchy
 
 # Simulation components
 from gem5.components.processors.cpu_types import CPUTypes
+from gem5.components.processors.simple_processor import SimpleProcessor
+from gem5.isas import ISA
 from gem5.resources.resource import BinaryResource
 from gem5.simulate.exit_event import ExitEvent
 from gem5.simulate.simulator import Simulator
-from gem5.isas import ISA
 
-# Import your newly compiled SimObject and the CoherentXBar interconnect
-from m5.objects import AmxAccl, CoherentXBar
-
-# Standard libraries
-from pathlib import Path
-import m5.debug
-
-'''
+"""
 Usage: in root directory run
 $ ./gem5.debug amx/tb.py
-'''
+"""
 
 # Define the path to your compiled test binary
-binary_path = Path("amx-workloads/load_test")
+binary_path = Path("configs/amx/load_test")
 
 # Setup Cache Hierarchy (64 KiB L1 Instruction and Data caches)
 cache_hierarchy = PrivateL1CacheHierarchy(
@@ -40,7 +46,7 @@ memory = SingleChannelDDR4_2400("8GiB")
 processor = SimpleProcessor(
     cpu_type=CPUTypes.TIMING,  # In-order detailed timing processor model
     num_cores=1,
-    isa=ISA.X86
+    isa=ISA.X86,
 )
 
 # -------------------------------------------------------------------------
@@ -67,7 +73,9 @@ for core in processor.cores:
         core_wrapper.amx_l1_xbar.frontend_latency = 1
         # FIX: Added missing snoop latency parameter
         core_wrapper.amx_l1_xbar.snoop_response_latency = 1
-        core_wrapper.amx_l1_xbar.width = 64  # Match a full 64-byte cache line width
+        core_wrapper.amx_l1_xbar.width = (
+            64  # Match a full 64-byte cache line width
+        )
 
         # Connect the downstream side of our crossbar to the L1 Cache port
         core_wrapper.amx_l1_xbar.mem_side_ports = port
@@ -76,10 +84,12 @@ for core in processor.cores:
         orig_connect_dcache(core_wrapper.amx_l1_xbar.cpu_side_ports)
 
         # Connect our AMX accelerator master port to the crossbar's upstream vector ports
-        core_wrapper.core.amx_accl.mem_side = core_wrapper.amx_l1_xbar.cpu_side_ports
+        core_wrapper.core.amx_accl.mem_side = (
+            core_wrapper.amx_l1_xbar.cpu_side_ports
+        )
 
     # 4. Use object.__setattr__ to bypass the strict SimObject parameter check
-    object.__setattr__(core, 'connect_dcache', extended_connect_dcache)
+    object.__setattr__(core, "connect_dcache", extended_connect_dcache)
 # -------------------------------------------------------------------------
 
 # Setup the board (SimpleBoard handles the plumbing for SE mode environment)
@@ -92,9 +102,7 @@ board = SimpleBoard(
 
 # Setup Workload binary to execute inside the simulator
 board.set_se_binary_workload(
-    binary=BinaryResource(
-        local_path=binary_path.as_posix()
-    )
+    binary=BinaryResource(local_path=binary_path.as_posix())
 )
 
 # -------------------------------------------------------------------------
@@ -126,6 +134,8 @@ def workend_handler():
     # m5.debug.flags["AMX"].disable()
 
     yield False  # Yielding False tells the simulator to resume execution immediately
+
+
 # -------------------------------------------------------------------------
 
 
@@ -134,8 +144,8 @@ simulator = Simulator(
     board=board,
     on_exit_event={
         ExitEvent.WORKBEGIN: workbegin_handler(),
-        ExitEvent.WORKEND: workend_handler()
-    }
+        ExitEvent.WORKEND: workend_handler(),
+    },
 )
 
 print(f"Starting SE Simulation for: {binary_path.name}")
