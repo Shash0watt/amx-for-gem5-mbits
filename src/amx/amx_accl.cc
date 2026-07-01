@@ -10,6 +10,8 @@
 namespace gem5
 {
 
+
+
 AmxAccl::AmxAccl(const AmxAcclParams &params) :
     ClockedObject(params),
     cpu(nullptr) // Pointer to the parent CPU, initialized as null and set via setCPU() by the CPU itself
