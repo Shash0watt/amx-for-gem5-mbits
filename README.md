@@ -29,7 +29,12 @@ cd util/m5 && scons build/x86/out/m5
 ```
 
 
-### (for me) check server usage
+### (for me)
+
+- for linting
+``` bash
+scons build/X86/gem5.opt CCFL                       AGS="-fsyntax-only"
+```
 
 - see users server
 ``` bash

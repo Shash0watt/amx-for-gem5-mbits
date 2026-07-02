@@ -1,178 +1,157 @@
 #include "amx/amx_accl.hh"
-#include <iostream>
 
-// Needed for debug flags
+#include <cstdio>
+#include <iostream>
+#include <memory>
+#include <string>
+
 #include "arch/generic/mmu.hh"
 #include "base/trace.hh"
 #include "cpu/base.hh"
 #include "debug/AMX.hh"
+#include "params/AmxAccl.hh"
 
 namespace gem5
 {
 
-AmxAccl::AmxAccl(const AmxAcclParams &params)
-    : ClockedObject(params),
-      cpu(nullptr) // Pointer to the parent CPU, initialized as null and set
-                   // via setCPU() by the CPU itself
+AmxAccl::AmxAccl(const Params &params)
+    : ClockedObject(params), cpu(nullptr), currentCfg{}
 {
+    // initialize tiles array to zero
+    for (int i = 0; i < NUM_TILES; i++) {
+        tiles[i] = {};
+    }
 
-    TileCfg currentCfg = {};
-    TileReg tiles[NUM_TILES] = {};
-
-
-    // struct TileCfg {
-    //         uint8_t palette_id;
-    //         uint8_t start_row;
-    //         uint8_t reserved_0[14];
-    //         uint16_t colsb[16];
-    //         uint8_t rows[16];
-    //     };
-
-    // for debugging and so that we don't need the tile config instruction
+    // set up default configuration values
+    // // for debugging and so that we don't need the tile config instruction
     // right now
-    currentCfg.palette_id =
-        1; // this means that the AMX accelerator will be on..
-    // TODO implement palette_id check
-    currentCfg.start_row = 0; // TODO implement start_row behaviour
+    currentCfg.palette_id = 1;
+    currentCfg.start_row = 0;
 
+    // set default row and column bounds for all tiles
     for (int i = 0; i < NUM_TILES; i++) {
         currentCfg.rows[i] = MAX_ROWS;
         currentCfg.colsb[i] = MAX_COLS_BYTES;
     }
 
-    DPRINTF(AMX, "Created the AMX object\n");
+    DPRINTF(AMX, "created the amx object\n");
 }
 
 void
 AmxAccl::setCPU(BaseCPU *_cpu)
 {
     cpu = _cpu;
-    DPRINTF(AMX, "Parent CPU is set to %s\n", cpu->name());
+    DPRINTF(AMX, "parent cpu is set to %s\n", cpu->name());
 }
 
 void
 AmxAccl::handleMemResponse(PacketPtr pkt)
 {
-    DPRINTF(AMX, "AMX: handleMemResponse called for packet at paddr 0x%lx\n",
+    DPRINTF(AMX, "amx: handleMemResponse called for packet at paddr 0x%lx\n",
             pkt->getAddr());
 
+    // inline lambda function to delete packets without repeating code
+    auto dropPacket = [](PacketPtr p) {
+        if (p->senderState) {
+            delete p->popSenderState();
+        }
+        delete p;
+    };
+
+    // check if the memory request failed
     if (pkt->isError()) {
-        DPRINTF(AMX, "Packet returned with an ERROR status, Destination "
-                     "Address was unmapped or faulty.\n");
-        if (pkt->senderState) {
-            delete pkt->popSenderState();
-        }
-        delete pkt;
+        DPRINTF(AMX, "packet returned with an error status\n");
+        dropPacket(pkt);
         return;
     }
 
+    // check if the packet is empty
     if (!pkt->hasData()) {
-        DPRINTF(
-            AMX,
-            "Packet arrived safely, but contains NO data payload to print.\n");
-        if (pkt->senderState) {
-            delete pkt->popSenderState();
-        }
-        delete pkt;
+        DPRINTF(AMX, "packet arrived safely but contains no data payload\n");
+        dropPacket(pkt);
         return;
     }
 
-    // Pop our custom tracking token off the packet state stack
-    AmxSenderState *state =
-        dynamic_cast<AmxSenderState *>(pkt->popSenderState());
+    // extract and verify the tracking state from the packet
+    auto *state = dynamic_cast<AmxSenderState *>(pkt->popSenderState());
     panic_if(
         !state,
-        "AMX response packet arrived missing its tracking SenderState token!");
+        "amx response packet arrived missing its tracking senderstate token!");
 
-    // Interpret the packet data buffer as signed 8-bit integers
-    int8_t *data_ptr = reinterpret_cast<int8_t *>(pkt->getPtr<uint8_t>());
-
-    std::string int8_output = "";
+    // convert raw packet bytes into a readable int8 string for debugging
+    auto *data_ptr = reinterpret_cast<int8_t *>(pkt->getPtr<uint8_t>());
+    std::string int8_output;
     for (int i = 0; i < pkt->getSize(); i++) {
-        char buf[8];
-        snprintf(buf, sizeof(buf), "%d ", data_ptr[i]);
-        int8_output += buf;
+        int8_output += std::to_string(data_ptr[i]) + " ";
     }
 
-    DPRINTF(AMX, "Data loaded into matrix (as int8): [ %s]\n",
+    DPRINTF(AMX, "data loaded into matrix (as int8): [ %s]\n",
             int8_output.c_str());
 
+    // clean up allocated memory
     delete state;
     delete pkt;
 }
 
 void
 AmxAccl::startup()
-{ DPRINTF(AMX, "AMX Object startup completed\n"); }
+{ DPRINTF(AMX, "amx object startup completed\n"); }
 
 void
 AmxAccl::startAmxLoad(ThreadContext *tc, uint64_t dest_tile, uint64_t src_mem,
-                      size_t stride)
+                      std::size_t stride)
 {
-    DPRINTF(AMX, "Received amxLoadd.. Dest: %llu, Src: %llu, Stride: %lu\n",
+    DPRINTF(AMX, "received amxload. dest: %llu, src: %llu, stride: %lu\n",
             dest_tile, src_mem, stride);
 
-    // Internal core multiplexing debug log
-    if (cpu) {
-        RequestPort &dcache_port =
-            dynamic_cast<RequestPort &>(cpu->getDataPort());
-        DPRINTF(AMX, "Accessing CPU's dcache port: %s\n", dcache_port.name());
-    } else {
-        DPRINTF(AMX, "Warning, CPU pointer is null in startAmxLoad!\n");
+    // stop early if there is no cpu pointer to avoid crashes or wasting
+    // resources
+    if (!cpu) {
+        DPRINTF(AMX, "warning: cpu pointer is null in startAmxLoad! dropping "
+                     "request.\n");
+        return;
     }
 
-    // align the virtual address to a standard 64-byte cache line
-    int cache_line_size = 64;
-    uint64_t aligned_src_mem = src_mem & ~(cache_line_size - 1);
+    // get the cache port once and reuse it to avoid multiple dynamic casts
+    auto &dcache_port = dynamic_cast<RequestPort &>(cpu->getDataPort());
+    DPRINTF(AMX, "accessing cpu dcache port: %s\n", dcache_port.name());
 
-    // make a baseline master Request object
-    // get the RequestorID, instruction pointer, and context ID directly from
-    // the CPU thread.
-    RequestPtr req = std::make_shared<Request>(
-        aligned_src_mem, cache_line_size,
-        0,                                  // Flags
-        tc->getCpuPtr()->dataRequestorId(), // ID from the attached core
-        tc->pcState().instAddr(),           // The current instruction PC
-        tc->contextId()                     // The thread ID
-    );
+    // align the memory address to a standard 64-byte cache line
+    constexpr int CACHE_LINE_SIZE = 64;
+    uint64_t aligned_src_mem = src_mem & ~(CACHE_LINE_SIZE - 1);
 
-    // TODO: perform a timing page-walk/address translation
+    // build the memory request object
+    RequestPtr req =
+        std::make_shared<Request>(aligned_src_mem, CACHE_LINE_SIZE, 0,
+                                  tc->getCpuPtr()->dataRequestorId(),
+                                  tc->pcState().instAddr(), tc->contextId());
+
+    // translate the virtual memory address to a physical address using the mmu
     Fault fault = tc->getMMUPtr()->translateFunctional(req, tc, BaseMMU::Read);
+
+    // stop if the address translation fails
     if (fault != NoFault) {
-        DPRINTF(AMX, "Translation failed for virtual address 0x%lx\n",
+        DPRINTF(AMX, "translation failed for virtual address 0x%lx\n",
                 src_mem);
         return;
     }
 
-    // make a Read Packet
+    // allocate a new memory packet and attach tracking state to it
     PacketPtr pkt = new Packet(req, MemCmd::ReadReq);
-    pkt->allocate(); // used to initialize a data buffer within the packet
+    pkt->allocate();
     pkt->pushSenderState(new AmxSenderState(dest_tile, 0));
 
-    // For the barebones phase, print debug messages and try to send the
-    // request via CPU's dcache port. Instead of our deprecated amxMemPort, we
-    // now push requests directly onto the parent CPU's dcache_port.
-    if (cpu) {
-        RequestPort &dcache_port =
-            dynamic_cast<RequestPort &>(cpu->getDataPort());
-        if (dcache_port.sendTimingReq(pkt)) {
-            DPRINTF(AMX,
-                    "Timing read request successfully sent via CPU dcache "
-                    "port for physical address 0x%lx\n",
-                    req->getPaddr());
-        } else {
-            DPRINTF(AMX, "CPU dcache port rejected the timing request (busy). "
-                         "Retries are not handled yet\n");
-            if (pkt->senderState) {
-                delete pkt->popSenderState();
-            }
-            delete pkt;
-        }
+    // try to send the packet through the cache port
+    if (dcache_port.sendTimingReq(pkt)) {
+        DPRINTF(AMX,
+                "timing read request successfully sent for physical address "
+                "0x%lx\n",
+                req->getPaddr());
     } else {
-        DPRINTF(AMX, "CPU pointer not set, dropping packet\n");
-        if (pkt->senderState) {
-            delete pkt->popSenderState();
-        }
+        DPRINTF(AMX, "cpu dcache port rejected the timing request because it "
+                     "is busy\n");
+        // clean up the packet immediately if it was rejected
+        delete pkt->popSenderState();
         delete pkt;
     }
 }
